@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>emmyQ.fm</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Helvetica Neue', -apple-system, sans-serif;
+            background-color: #111;
+            overflow: hidden; /* Prevent scrollbars during background zoom */
+        }
+        .background-container {
+            position: relative; height: 100vh; width: 100vw;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .background-container::before {
+            content: '';
+            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
+            background-image: url('./assets/cat_bg.jpeg'); 
+            background-size: cover; background-position: center;
+            z-index: 0;
+            animation: slowZoom 30s infinite alternate ease-in-out;
+        }
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, rgba(10,10,10,0.4), rgba(30,20,40,0.4), rgba(5,5,5,0.8));
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite alternate;
+            z-index: 1;
+        }
+        .content { position: relative; z-index: 2; text-align: center; color: #ffffff; }
+        .domain-title {
+            font-size: 4.5rem; font-weight: 300; letter-spacing: 0.15rem; margin: 0;
+            opacity: 0; animation: fadeSlideUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .subtitle {
+            font-size: 1.25rem; font-weight: 300; letter-spacing: 0.2rem;
+            margin-top: 1rem; text-transform: uppercase; opacity: 0;
+            animation: fadeSlideUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s forwards;
+        }
+        .audio-container {
+            margin-top: 2.5rem; opacity: 0;
+            animation: fadeSlideUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s forwards;
+        }
+        .play-btn {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff; padding: 0.75rem 1.5rem; font-size: 0.9rem;
+            letter-spacing: 0.1rem; text-transform: uppercase; border-radius: 50px;
+            cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; outline: none;
+        }
+        .play-btn:hover {
+            background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .play-btn.playing { 
+            background: rgba(255, 255, 255, 0.9); color: #111; border-color: #ffffff;
+            animation: pulseGlow 2.5s infinite alternate ease-in-out;
+        }
+        .visualizer { display: none; gap: 3px; height: 12px; align-items: flex-end; }
+        .play-btn.playing .visualizer { display: flex; }
+        .play-btn.playing .icon-play { display: none; }
+        .bar { width: 3px; background-color: #111; border-radius: 2px; animation: bounce 0.5s ease infinite alternate; }
+        .bar:nth-child(2) { animation-delay: 0.1s; }
+        .bar:nth-child(3) { animation-delay: 0.2s; }
+        .bar:nth-child(4) { animation-delay: 0.3s; }
+        @keyframes bounce { 0% { height: 4px; } 100% { height: 12px; } }
+        @keyframes fadeSlideUp {
+            0% { opacity: 0; transform: translateY(30px); filter: blur(4px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes slowZoom {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.05) translate(-1%, -1%); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(255,255,255,0.1); transform: translateY(-2px); }
+            100% { box-shadow: 0 0 25px rgba(255,255,255,0.5); transform: translateY(-2px); }
+        }
+        @media (max-width: 768px) { .domain-title { font-size: 3rem; } .subtitle { font-size: 1rem; } }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <div class="overlay"></div>
+        <div class="content">
+            <h1 class="domain-title">emmyQ.fm</h1>
+            <p class="subtitle">Curating the Sounds | Coming Soon.</p>
+            <div class="audio-container">
+                <button id="play-btn" class="play-btn">
+                    <span class="icon-play">▶</span>
+                    <div class="visualizer">
+                        <div class="bar"></div><div class="bar"></div>
+                        <div class="bar"></div><div class="bar"></div>
+                    </div>
+                    <span id="btn-text">Tune In</span>
+                </button>
+                <audio id="bg-audio" loop preload="auto">
+                    <source src="./assets/Faded_Inner_Sleeve.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const playBtn = document.getElementById('play-btn');
+            const audio = document.getElementById('bg-audio');
+            const btnText = document.getElementById('btn-text');
+
+            playBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play().then(() => {
+                        playBtn.classList.add('playing');
+                        btnText.textContent = 'Listening';
+                    }).catch(err => console.error("Audio playback failed:", err));
+                } else {
+                    audio.pause();
+                    playBtn.classList.remove('playing');
+                    btnText.textContent = 'Tune In';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
