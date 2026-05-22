@@ -6,13 +6,13 @@
     <title>emmyQ.fm</title>
     <style>
         body, html {
-            margin: 0; padding: 0; height: 100%;
+            margin: 0; padding: 0; height: 100%; height: 100dvh;
             font-family: 'Helvetica Neue', -apple-system, sans-serif;
             background-color: #111;
             overflow: hidden; /* Prevent scrollbars during background zoom */
         }
         .background-container {
-            position: relative; height: 100vh; width: 100vw;
+            position: relative; height: 100vh; height: 100dvh; width: 100vw;
             display: flex; align-items: center; justify-content: center;
         }
         .background-container::before {
@@ -30,7 +30,10 @@
             animation: gradientShift 15s ease infinite alternate;
             z-index: 1;
         }
-        .content { position: relative; z-index: 2; text-align: center; color: #ffffff; }
+        .content { 
+            position: relative; z-index: 2; text-align: center; color: #ffffff; 
+            padding: 0 1.5rem; width: 100%; box-sizing: border-box; 
+        }
         .domain-title {
             font-size: 4.5rem; font-weight: 300; letter-spacing: 0.15rem; margin: 0;
             opacity: 0; animation: fadeSlideUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -84,7 +87,11 @@
             0% { box-shadow: 0 0 10px rgba(255,255,255,0.1); transform: translateY(-2px); }
             100% { box-shadow: 0 0 25px rgba(255,255,255,0.5); transform: translateY(-2px); }
         }
-        @media (max-width: 768px) { .domain-title { font-size: 3rem; } .subtitle { font-size: 1rem; } }
+        @media (max-width: 768px) { 
+            .domain-title { font-size: 2.5rem; } 
+            .subtitle { font-size: 0.85rem; letter-spacing: 0.15rem; } 
+            .play-btn { padding: 0.85rem 2rem; }
+        }
     </style>
 </head>
 <body>
